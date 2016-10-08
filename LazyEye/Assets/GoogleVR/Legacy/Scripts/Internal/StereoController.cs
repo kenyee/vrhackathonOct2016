@@ -347,7 +347,9 @@ public class StereoController : MonoBehaviour {
       // Turn off the mono camera so it doesn't waste time rendering.  Remember to reenable.
       // @note The mono camera is left on from beginning of frame till now in order that other game
       // logic (e.g. referring to Camera.main) continues to work as expected.
-      cam.enabled = false;
+	  if (cam != null) {
+		cam.enabled = false;
+      }
       renderedStereo = true;
     } else {
       GvrViewer.Instance.UpdateState();
