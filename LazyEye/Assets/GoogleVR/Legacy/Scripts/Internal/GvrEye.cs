@@ -16,6 +16,7 @@
 /// VR player is the in-editor emulator.
 
 using UnityEngine;
+using UnityStandardAssets.ImageEffects;
 
 /// Controls one camera of a stereo pair.  Each frame, it mirrors the settings of
 /// the parent mono Camera, and then sets up side-by-side stereo with
@@ -178,6 +179,14 @@ public class GvrEye : MonoBehaviour {
           Time.deltaTime / (controller.stereoAdjustSmoothing + Time.deltaTime) : 1;
       transform.localPosition = Vector3.Lerp(transform.localPosition, eyePos, interpPosition);
     }
+	
+	cam.cullingMask &= 0xffffffcf;
+	if (eye == GvrViewer.Eye.Left) {
+		// makes implicit assumption that Left Eye layer is 8 and Right Eye is 9
+		cam.cullingMask |= 0x10;
+	} else {
+		cam.cullingMask |= 0x20;
+	}
 
     // Pass necessary information to any shaders doing distortion correction.
     if (!GvrViewer.Instance.DistortionCorrectionEnabled) {
