@@ -98,7 +98,14 @@ public class GvrEye : MonoBehaviour {
 
 #if !UNITY_HAS_GOOGLEVR || UNITY_EDITOR
   void Awake() {
-    cam = GetComponent<Camera>();
+	cam = GetComponent<Camera>();
+
+	leftEyeLayer = LayerMask.NameToLayer ("LeftEye");
+	rightEyeLayer = LayerMask.NameToLayer ("RightEye");
+
+	leftEyeLayerMask = 1 << leftEyeLayer;
+	rightEyeLayerMask = 1 << rightEyeLayer;
+	eyeLayersStripMask = ~(leftEyeLayerMask | rightEyeLayerMask);
   }
 
   void Start() {
@@ -112,15 +119,6 @@ public class GvrEye : MonoBehaviour {
     controller = ctlr;
     monoCamera = controller.GetComponent<Camera>();
 	SetupStereo(/*forceUpdate=*/true);
-
-	leftEyeLayer = LayerMask.NameToLayer ("LeftEye");
-	rightEyeLayer = LayerMask.NameToLayer ("RightEye");
-	leftEyeLayerMask = 1 << leftEyeLayer;
-	rightEyeLayerMask = 1 << rightEyeLayer;
-	eyeLayersStripMask = ~(leftEyeLayerMask | rightEyeLayerMask);
-
-		Debug.LogWarning ("lefteye layer is " + leftEyeLayer);
-		Debug.LogWarning ("righteye layer is " + rightEyeLayer);
   }
 
   public void UpdateStereoValues() {
@@ -258,11 +256,11 @@ public class GvrEye : MonoBehaviour {
     cam.CopyFrom(monoCamera);
     cam.cullingMask ^= toggleCullingMask.value;
 
-	cam.cullingMask = ~0x300; // eyeLayersStripMask;
+	cam.cullingMask &= eyeLayersStripMask;
 	if (eye == GvrViewer.Eye.Left) {
-		cam.cullingMask |= 0x100; //|= leftEyeLayerMask;
+		cam.cullingMask |= leftEyeLayerMask;
 	} else {
-		cam.cullingMask |= 0x200;  //|= rightEyeLayerMask;
+		cam.cullingMask |= rightEyeLayerMask;
 	}
 
     // Not sure why we have to do this, but if we don't then switching between drawing to
