@@ -45,6 +45,12 @@ public class GvrEye : MonoBehaviour {
   [Tooltip("Culling mask layers that this eye should toggle relative to the parent camera.")]
   public LayerMask toggleCullingMask = 0;
 
+  private int eyeLayersStripMask;
+  private int leftEyeLayerMask;
+  private int rightEyeLayerMask;
+  public LayerMask leftEyeLayer;
+  public LayerMask rightEyeLayer;
+
   /// The StereoController in charge of this eye (and whose mono camera
   /// we will copy settings from).
   public StereoController Controller {
@@ -105,7 +111,16 @@ public class GvrEye : MonoBehaviour {
     // Save reference to the found controller and it's camera.
     controller = ctlr;
     monoCamera = controller.GetComponent<Camera>();
-    SetupStereo(/*forceUpdate=*/true);
+	SetupStereo(/*forceUpdate=*/true);
+
+	leftEyeLayer = LayerMask.NameToLayer ("LeftEye");
+	rightEyeLayer = LayerMask.NameToLayer ("RightEye");
+	leftEyeLayerMask = 1 << leftEyeLayer;
+	rightEyeLayerMask = 1 << rightEyeLayer;
+	eyeLayersStripMask = ~(leftEyeLayerMask | rightEyeLayerMask);
+
+		Debug.LogWarning ("lefteye layer is " + leftEyeLayer);
+		Debug.LogWarning ("righteye layer is " + rightEyeLayer);
   }
 
   public void UpdateStereoValues() {
@@ -179,14 +194,6 @@ public class GvrEye : MonoBehaviour {
           Time.deltaTime / (controller.stereoAdjustSmoothing + Time.deltaTime) : 1;
       transform.localPosition = Vector3.Lerp(transform.localPosition, eyePos, interpPosition);
     }
-	
-	cam.cullingMask &= 0xffffffcf;
-	if (eye == GvrViewer.Eye.Left) {
-		// makes implicit assumption that Left Eye layer is 8 and Right Eye is 9
-		cam.cullingMask |= 0x10;
-	} else {
-		cam.cullingMask |= 0x20;
-	}
 
     // Pass necessary information to any shaders doing distortion correction.
     if (!GvrViewer.Instance.DistortionCorrectionEnabled) {
@@ -250,6 +257,13 @@ public class GvrEye : MonoBehaviour {
     // Sync the camera properties.
     cam.CopyFrom(monoCamera);
     cam.cullingMask ^= toggleCullingMask.value;
+
+	cam.cullingMask = ~0x300; // eyeLayersStripMask;
+	if (eye == GvrViewer.Eye.Left) {
+		cam.cullingMask |= 0x100; //|= leftEyeLayerMask;
+	} else {
+		cam.cullingMask |= 0x200;  //|= rightEyeLayerMask;
+	}
 
     // Not sure why we have to do this, but if we don't then switching between drawing to
     // the main screen or to the stereo rendertexture acts very strangely.
