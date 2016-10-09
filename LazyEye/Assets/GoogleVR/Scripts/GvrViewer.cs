@@ -101,6 +101,19 @@ public class GvrViewer : MonoBehaviour {
   [SerializeField]
   private bool vrModeEnabled = true;
 
+  public void SwitchLazyEye() {
+	switch (lazyEye) {
+	case Eye.Left:
+		lazyEye = Eye.Right;
+		break;
+	case Eye.Right:
+		lazyEye = Eye.Left;
+		break;
+	}
+  }
+  [SerializeField]
+  private GvrViewer.Eye lazyEye = Eye.Left;
+
   /// Determines whether distortion correction is enabled.
   public bool DistortionCorrectionEnabled {
     get {

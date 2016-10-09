@@ -46,6 +46,10 @@ public class Teleport : MonoBehaviour, IGvrGazeResponder {
   public void ToggleDistortionCorrection() {
     GvrViewer.Instance.DistortionCorrectionEnabled =
       !GvrViewer.Instance.DistortionCorrectionEnabled;
+	}
+
+  public void SwitchLazyEye() {
+	GvrViewer.Instance.SwitchLazyEye();
   }
 
 #if !UNITY_HAS_GOOGLEVR || UNITY_EDITOR
