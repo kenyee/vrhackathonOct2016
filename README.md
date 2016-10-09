@@ -26,4 +26,5 @@ Ken Yee
 For the other projects, check out these github repos:
 
 [VRCinema](https://github.com/preetishkakkar/VRCinemaHackton)
+[LazyEye](https://github.com/githubildar/LazyEye)
 
